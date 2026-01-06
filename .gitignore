@@ -1,0 +1,91 @@
+# ======================
+# OS / Editor
+# ======================
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# ======================
+# Logs
+# ======================
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ======================
+# Node / Package managers
+# ======================
+node_modules/
+.pnpm-store/
+.npm/
+.yarn/
+.yarn-cache/
+
+# ======================
+# Next.js / React
+# ======================
+.next/
+out/
+dist/
+build/
+.vercel/
+.turbo/
+*.tsbuildinfo
+
+# Env files (per-app)
+.env
+.env.*
+!.env.example
+
+# ======================
+# Firebase
+# ======================
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+database-debug.log
+pubsub-debug.log
+storage-debug.log
+*-debug.log
+
+# Firebase local cache & temp
+.firebase/
+.cache/
+tmp/
+temp/
+
+# Emulator persisted data (recommended to NOT commit)
+firebase/.emulator-data/
+firebase/.emulators/
+
+# If you export via `--export-on-exit` elsewhere
+emulator-data/
+.emulator-data/
+
+# ======================
+# Functions build output
+# ======================
+firebase/functions/lib/
+firebase/functions/node_modules/
+
+# ======================
+# Test coverage
+# ======================
+coverage/
+
+# ======================
+# Misc
+# ======================
+*.pem
+*.key
+
+node_modules/
+firebase/functions/node_modules/
+
+# Firebase Emulator persisted data
+.firebase/emulator-data/

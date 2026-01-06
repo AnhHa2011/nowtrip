@@ -1,0 +1,24 @@
+{
+    "name": "nowtrip",
+    "private": true,
+    "workspaces": [
+        "apps/*",
+        "packages/*",
+        "firebase/functions"
+    ],
+    "scripts": {
+        "dev:public": "npm --workspace apps/public-web run dev",
+        "dev:portal": "npm --workspace apps/portal-web run dev",
+        "build:public": "npm --workspace apps/public-web run build",
+        "build:portal": "npm --workspace apps/portal-web run build",
+        "lint": "npm -ws run lint",
+        "typecheck": "npm -ws run typecheck",
+        "firebase:emulators": "firebase emulators:start",
+        "firebase:deploy:staging": "firebase use staging && firebase deploy",
+        "firebase:deploy:prod": "firebase use prod && firebase deploy",
+        "emulators": "cd firebase && firebase emulators:start",
+        "emu": "firebase emulators:start --import=.firebase/emulator-data --export-on-exit=.firebase/emulator-data",
+        "emu:clean": "rm -rf .firebase/emulator-data",
+        "emu:export": "firebase emulators:export .firebase/emulator-data --force"
+    }
+}

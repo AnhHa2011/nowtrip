@@ -1,0 +1,60 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function role() {
+      return signedIn() && request.auth.token.role != null
+        ? request.auth.token.role
+        : null;
+    }
+
+    function isAdmin() { return role() == "admin"; }
+    function isStaff() { return role() == "staff" || isAdmin(); }
+
+    // ---- LEADS ----
+    match /leads/{leadId} {
+      // Server-only create: client không được tạo lead
+      allow create: if false;
+
+      // Staff/admin đọc được
+      allow get, list: if isStaff();
+
+      // Staff được update một số field (status, assignedTo) + updatedAt
+      allow update: if isStaff()
+        && request.resource.data.diff(resource.data).changedKeys()
+          .hasOnly(["status", "assignedTo", "updatedAt", "lastContactedAt"])
+        && request.resource.data.status in ["new","contacting","scheduled","won","lost"];
+
+      // Không cho delete
+      allow delete: if false;
+
+      // Activities: chỉ staff/admin add, không sửa/xoá
+      match /activities/{activityId} {
+        allow get, list: if isStaff();
+        allow create: if isStaff();
+        allow update, delete: if false;
+      }
+    }
+
+    // ---- TOURS / PROMOS (admin-only) ----
+    match /tours/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /promos/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ---- USERS ----
+    match /users/{uid} {
+      allow read: if signedIn() && (isAdmin() || request.auth.uid == uid);
+      allow write: if isAdmin(); // staff không CRUD user
+    }
+  }
+}
