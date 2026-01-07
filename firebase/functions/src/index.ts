@@ -1,9 +1,10 @@
-import { initializeApp } from "firebase-admin/app";
-import { setGlobalOptions } from "firebase-functions/v2";
+import {initializeApp} from "firebase-admin/app";
+import {setGlobalOptions} from "firebase-functions/v2";
 
 initializeApp();
-setGlobalOptions({ region: "asia-southeast1" });
+setGlobalOptions({region: "asia-southeast1"});
 
-export { public_submitLead } from "./public/submitLead";
-export { admin_createStaffUser } from "./admin/createStaffUser";
-export { dev_setMyRoleAdmin } from "./admin/devSetMyRoleAdmin";
+export {publicSubmitLead} from "./public/submitLead";
+export {adminCreateStaffUser} from "./admin/createStaffUser";
+export {devSetMyRoleAdmin} from "./admin/devSetMyRoleAdmin";
+export {adminExportLeadsCsv} from "./admin/exportLeadsCsv";

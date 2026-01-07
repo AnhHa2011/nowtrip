@@ -14,6 +14,7 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Timestamp } from "firebase/firestore";
+import { httpsCallable } from "firebase/functions";
 
 function isSlaBreached(createdAt?: Timestamp | null, hours = 24): boolean {
     if (!createdAt) return false;
@@ -42,7 +43,7 @@ function getTab(searchParams: any): LeadsTab {
 }
 
 export default function LeadsPage() {
-    const { auth, db } = useMemo(() => getFirebase(), []);
+    const { auth, db, functions } = useMemo(() => getFirebase(), []);
     const router = useRouter();
 
     const [ready, setReady] = useState(false);
@@ -50,6 +51,8 @@ export default function LeadsPage() {
     const [status, setStatus] = useState<StatusFilter>("all");
     const [onlyMine, setOnlyMine] = useState(false);
     const [search, setSearch] = useState("");
+    const [isAdmin, setIsAdmin] = useState(false);
+    const [exporting, setExporting] = useState(false);
 
     useEffect(() => {
         const unsubAuth = onAuthStateChanged(auth, (user) => {
@@ -80,7 +83,30 @@ export default function LeadsPage() {
 
         return () => unsubAuth();
     }, [auth, db, router, status, onlyMine]);
+    // Hàm xử lý Export
+    const handleExport = async () => {
+        if (!confirm("Download all leads as CSV?")) return;
+        setExporting(true);
+        try {
+            const fn = httpsCallable(functions, "admin_exportLeadsCsv");
+            const result = await fn();
+            const { csvContent } = result.data as any;
 
+            // Trigger download browser
+            const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.setAttribute("download", `leads_export_${new Date().toISOString().slice(0, 10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } catch (e) {
+            alert("Export failed: " + (e as any).message);
+        } finally {
+            setExporting(false);
+        }
+    };
     const filtered = useMemo(() => {
         const s = search.trim().toLowerCase();
         if (!s) return leads;
@@ -95,7 +121,22 @@ export default function LeadsPage() {
     return (
         <main style={{ padding: 24 }}>
             <h1>Leads</h1>
-
+            {isAdmin && (
+                <button
+                    onClick={handleExport}
+                    disabled={exporting}
+                    style={{
+                        backgroundColor: "#0f172a",
+                        color: "white",
+                        padding: "8px 16px",
+                        borderRadius: 6,
+                        cursor: exporting ? "wait" : "pointer",
+                        opacity: exporting ? 0.7 : 1
+                    }}
+                >
+                    {exporting ? "Exporting..." : "⬇ Export CSV"}
+                </button>
+            )}
             <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 12 }}>
                 <select value={status} onChange={(e) => setStatus(e.target.value as any)}>
                     {STATUS.map((s) => (
